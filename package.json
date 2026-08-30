@@ -1,0 +1,20 @@
+{
+  "name": "okx-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server exposing OKX public market data (ticker, kline, orderbook, instruments) for AI agents",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_USE_ENV_PROXY=1 tsx src/index.ts",
+    "dev:http": "NODE_USE_ENV_PROXY=1 TRANSPORT=http tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}
