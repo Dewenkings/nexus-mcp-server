@@ -1,11 +1,13 @@
 {
-  "name": "okx-mcp-server",
+  "name": "nexus-mcp-server",
   "version": "0.1.0",
   "description": "MCP server exposing OKX public market data (ticker, kline, orderbook, instruments) for AI agents",
   "type": "module",
   "scripts": {
     "dev": "NODE_USE_ENV_PROXY=1 tsx src/index.ts",
     "dev:http": "NODE_USE_ENV_PROXY=1 TRANSPORT=http tsx src/index.ts",
+    "client": "NODE_USE_ENV_PROXY=1 tsx src/client.ts",
+    "client:http": "TRANSPORT=http tsx src/client.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

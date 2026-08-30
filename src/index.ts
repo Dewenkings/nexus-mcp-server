@@ -10,7 +10,7 @@ async function runStdio(): Promise<void> {
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("okx-mcp-server (stdio) started");
+  console.error("nexus-mcp-server (stdio) started");
 }
 
 async function runHttp(): Promise<void> {
@@ -52,7 +52,7 @@ async function runHttp(): Promise<void> {
 
   httpServer.listen(PORT, () => {
     console.error(
-      `okx-mcp-server (Streamable HTTP) listening on http://localhost:${PORT}/mcp`,
+      `nexus-mcp-server (Streamable HTTP) listening on http://localhost:${PORT}/mcp`,
     );
   });
 }

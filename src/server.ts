@@ -21,7 +21,7 @@ const KLINE_BARS = [
 // 每次调用创建新的 server 实例（无状态，stdio 与 HTTP 复用同一份注册逻辑）
 export function createServer(): McpServer {
   const server = new McpServer({
-    name: "okx-mcp-server",
+    name: "nexus-mcp-server",
     version: "0.1.0",
   });
 

@@ -1,4 +1,4 @@
-# okx-mcp-server
+# nexus-mcp-server
 
 一个基于 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) 的 TypeScript 服务器，把 OKX 公开市场数据（行情、K 线、盘口、交易对）暴露为 AI Agent 可调用的工具。
 
@@ -33,9 +33,9 @@ npm run dev
 ```json
 {
   "mcpServers": {
-    "okx": {
+    "nexus": {
       "command": "npx",
-      "args": ["tsx", "/绝对路径/okx-mcp-server/src/index.ts"]
+      "args": ["tsx", "/绝对路径/nexus-mcp-server/src/index.ts"]
     }
   }
 }
@@ -45,7 +45,7 @@ npm run dev
 
 ```bash
 npm run dev:http
-# 监听 http://localhost:3000/mcp，健康检查 http://localhost:3000/health
+# 监听 http://localhost:3001/mcp，健康检查 http://localhost:3001/health
 ```
 
 ## 环境变量
@@ -62,6 +62,28 @@ OKX 在部分地区无法直连。`npm run dev` / `dev:http` 已通过 `NODE_USE
 - 若无代理且能直连 OKX，可去掉脚本里的 `NODE_USE_ENV_PROXY=1`。
 - 无代理环境变量时，该变量为 no-op，直连请求，不影响运行。
 
+## 本地测试（Client）
+
+项目内置一个 client，用于本地验证 server 的工具是否正常（无需接入 Claude Desktop / Cursor）。
+
+**stdio 模式（自动 spawn server）**：
+
+```bash
+npm run client
+```
+
+**HTTP 模式（需先启动 server）**：
+
+```bash
+# 终端 1：启动 server
+npm run dev:http
+
+# 终端 2：运行 client
+npm run client:http
+```
+
+client 会列出所有工具，并调用 `get_ticker` 与 `get_market_overview` 打印真实行情数据。
+
 ## 示例
 
 问 Agent：「现在 BTC 和 ETH 谁涨得多？」
@@ -74,6 +96,7 @@ Agent 会调用 `get_market_overview`，得到按成交额排序的行情概览�
 src/
 ├── index.ts    # 入口，按 TRANSPORT 切换 stdio / HTTP
 ├── server.ts   # MCP server 创建 + 工具注册
+├── client.ts   # 本地测试客户端
 ├── okx.ts      # OKX API 客户端封装
 └── types.ts    # OKX 返回类型定义
 ```
