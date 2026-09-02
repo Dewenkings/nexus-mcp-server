@@ -57,6 +57,8 @@ npm run build
 npm run start:http
 ```
 
+仓库根目录包含 `render.yaml`：可直接在 Render 导入 Blueprint，自动配置新加坡区域、免费实例、健康检查，并生成 256-bit `MCP_AUTH_TOKEN`，无需把密钥写进 Git。
+
 ## 环境变量
 
 | 变量 | 默认 | 说明 |
