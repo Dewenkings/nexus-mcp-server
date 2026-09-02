@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as okx from "./okx.js";
+import { loadMarketContext, type MarketDataClient } from "./market-context.js";
 
 const KLINE_BARS = [
   "1m",
@@ -19,7 +20,10 @@ const KLINE_BARS = [
 ] as const;
 
 // 每次调用创建新的 server 实例（无状态，stdio 与 HTTP 复用同一份注册逻辑）
-export function createServer(): McpServer {
+export function createServer(
+  dependencies: { marketClient?: MarketDataClient } = {},
+): McpServer {
+  const marketClient = dependencies.marketClient ?? okx;
   const server = new McpServer({
     name: "nexus-mcp-server",
     version: "0.1.0",
@@ -228,6 +232,53 @@ export function createServer(): McpServer {
           },
         ],
       };
+    },
+  );
+
+  const aggregateInputSchema = {
+    instrument: z.string().describe("USDT 现货交易对，如 BTC-USDT"),
+    bar: z.enum(KLINE_BARS).optional().describe("K 线周期，默认 1H"),
+    limit: z.number().int().min(20).max(100).optional().describe("K 线数量，默认 60"),
+    depth: z.number().int().min(5).max(50).optional().describe("盘口深度，默认 20"),
+  };
+
+  server.registerTool(
+    "get_market_context",
+    {
+      description: "一次获取指定 USDT 现货交易对的行情、K 线、盘口及确定性技术快照，适合 AI 市场解读。",
+      inputSchema: aggregateInputSchema,
+      annotations: { title: "Market Context", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+    },
+    async (input) => {
+      try {
+        const context = await loadMarketContext(marketClient, input);
+        return { content: [{ type: "text", text: JSON.stringify(context) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "Market context unavailable" }],
+        };
+      }
+    },
+  );
+
+  server.registerTool(
+    "get_technical_snapshot",
+    {
+      description: "计算指定交易对的趋势、价格区间位置、已实现波动率、量比及盘口失衡；所有指标均由行情确定性计算。",
+      inputSchema: aggregateInputSchema,
+      annotations: { title: "Technical Snapshot", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+    },
+    async (input) => {
+      try {
+        const context = await loadMarketContext(marketClient, input);
+        return { content: [{ type: "text", text: JSON.stringify(context.technical) }] };
+      } catch (error) {
+        return {
+          isError: true,
+          content: [{ type: "text", text: error instanceof Error ? error.message : "Technical snapshot unavailable" }],
+        };
+      }
     },
   );
 
